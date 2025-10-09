@@ -3,22 +3,39 @@ const PRICE_DATA = {
     // Harga profil per meter, dikelompokkan berdasarkan merek dan ukuran
     PROFIL: {
         "Inkalum": {
-            "3 inch": 55000,
-            "4 inch": 75000
+            "3 inch": 136000,
+            "4 inch": 147000
         },
         "Alexindo": {
-            "3 inch": 60000,
-            "4 inch": 80000
+            "3 inch": 155000,
+            "4 inch": 175000
+        },
+        "YKK": {
+            "3 inch": 185000,
+            "4 inch": 250000
         }
     },
     // Harga kaca per meter persegi, direstrukturisasi
     KACA: {
-        "Clear": {
-            "5mm": 150000,
-            "6mm": 200000
+        "Clear Temper": {
+            "5mm": 600000,
+            "6mm": 670000,
+            "8mm": 800000,
+            "10mm": 1200000
         },
-        "Rayben": {
-            "5mm": 180000
+        "Riben (Hitam)": {
+            "5mm": 300000,
+            "6mm": 500000,
+            "8mm": 600000
+        },
+        "Es/Blur": {
+            "5mm": 450000
+        },
+        "Cermin": {
+            "5mm": 870000
+        },
+        "Polos Biru": {
+            "5mm": 600000
         }
     },
     // Biaya aksesoris per unit
@@ -28,16 +45,16 @@ const PRICE_DATA = {
     }
 };
 
-const PRODUCT_FORMULA = {
-    "jendela": {
-        label: "Jendela Geser",
-        inputs: ["Tinggi (cm)", "Lebar (cm)", "Kuantitas Unit"],
-        // Opsi tambahan untuk produk ini
-        options: ["profil", "kaca"], 
-        formula: (inputs, options) => {
-            const [tinggi_cm, lebar_cm, kuantitas] = inputs;
-            // Konversi cm ke m untuk perhitungan harga
-            const tinggi_m = tinggi_cm / 100;
+    const PRODUCT_FORMULA = {
+        "jendela": {
+            label: "Jendela Geser",
+            inputs: ["Tinggi (cm)", "Lebar (cm)", "Kuantitas Unit"],
+            // Opsi tambahan untuk produk ini
+            options: ["profil", "kaca"], 
+            formula: (inputs, options) => {
+                const [tinggi_cm, lebar_cm, kuantitas] = inputs;
+                // Konversi cm ke m untuk perhitungan harga
+                const tinggi_m = tinggi_cm / 100;
             const lebar_m = lebar_cm / 100;
 
             // 1. Harga Profil Aluminium
