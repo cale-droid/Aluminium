@@ -47,7 +47,7 @@ const PRICE_DATA = {
 
     const PRODUCT_FORMULA = {
         "jendela": {
-            label: "Jendela Geser",
+            label: "Jendela",
             inputs: ["Total Tinggi (cm)", "Total Lebar (cm)", "Kuantitas Unit"],
             options: ["profil", "kaca"], 
             // Formula sekarang menerima input kaca secara terpisah
@@ -79,7 +79,7 @@ const PRICE_DATA = {
             }
         },
         "pintu": {
-            label: "Pintu Swing",
+            label: "Pintu",
             inputs: ["Tinggi (cm)", "Lebar (cm)", "Kuantitas Unit"],
             options: ["profil", "kaca"], // Pintu juga bisa punya opsi kaca
             formula: (inputs, options) => {
@@ -106,6 +106,24 @@ const PRICE_DATA = {
                     hargaProfil: totalHargaProfil,
                     hargaKaca: totalHargaKaca,
                     biayaAksesoris: biayaAksesoris
+                };
+            }
+        },
+        "segitiga": {
+            label: "Segitiga",
+            inputs: ["Alas (a)", "Tinggi (t)", "Kuantitas"],
+            options: [], // Tidak ada opsi profil atau kaca
+            formula: (inputs) => {
+                const [alas, tinggi, kuantitas] = inputs;
+
+                // Hitung luas segitiga
+                const luasSegitiga = (alas * tinggi) / 2;
+
+                // Kembalikan objek dengan rincian harga total
+                return {
+                    hargaProfil: 0,
+                    hargaKaca: 0,
+                    biayaAksesoris: 0
                 };
             }
         }
