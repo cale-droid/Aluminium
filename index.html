@@ -9,64 +9,70 @@
 </head>
 <body>
     
-    <div class="max-w-xl mx-auto p-6 mt-10 bg-white shadow-2xl rounded-xl">
+    <!-- Mengubah max-w agar lebih lebar dan menambahkan grid -->
+    <div class="max-w-6xl mx-auto p-6 mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         
-        <h1 class="text-3xl font-extrabold text-gray-800 text-center mb-8 border-b pb-3">
-            Aplikasi Penghitung Harga Aluminium 📐
-        </h1>
+        <!-- KOLOM KIRI: UNTUK INPUT DAN KONFIGURASI -->
+        <div class="bg-white shadow-2xl rounded-xl p-6">
+            <h1 class="text-3xl font-extrabold text-gray-800 text-center mb-8 border-b pb-3">
+                Konfigurasi Produk
+            </h1>
 
-        <div class="mb-6">
-<div class="relative flex items-center"> 
-    
-    <select id="product-type" onchange="showInputFields()"
-            class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150
-                   pr-10 appearance-none">
-        <option value="">-- Pilih Tipe --</option>
-        <option value="jendela">Jendela Geser (Sliding Window)</option>
-        <option value="pintu">Pintu Swing</option>
-        </select>
-
-    <svg class="w-5 h-5 absolute right-3 pointer-events-none text-gray-500" 
-         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 
-            111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-    </svg>
-</div>
-        </div>
-
-       <div id="input-area" class="p-4 border border-dashed border-blue-400 rounded-lg bg-blue-50" style="display: none;">
-            <div id="config-area" class="space-y-4 mb-6">
-                <!-- Opsi dinamis (merek, kaca) akan muncul di sini -->
+            <div class="mb-6">
+                <div class="relative flex items-center"> 
+                    <select id="product-type" onchange="showInputFields()"
+                            class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150
+                                   pr-10 appearance-none">
+                        <option value="">-- Pilih Tipe --</option>
+                        <option value="jendela">Jendela Geser</option>
+                        <option value="pintu">Pintu Swing</option>
+                    </select>
+                    <svg class="w-5 h-5 absolute right-3 pointer-events-none text-gray-500" 
+                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </div>
             </div>
 
-            <h3 class="text-xl font-bold text-gray-700 mb-4">Masukkan Dimensi (cm)</h3>
-            
-            <div id="dynamic-inputs" class="space-y-4">
+            <div id="input-area" class="p-4 border border-dashed border-blue-400 rounded-lg bg-blue-50" style="display: none;">
+                <div id="config-area" class="space-y-4 mb-6">
+                    <!-- Opsi dinamis (merek, kaca) akan muncul di sini -->
                 </div>
-            
-        <button onclick="calculatePrice()"
-                class="mt-6 w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition duration-200 shadow-md">
-            HITUNG HARGA (Rp)
-        </button>
+
+                <h3 class="text-xl font-bold text-gray-700 mb-4">Masukkan Dimensi</h3>
+                
+                <div id="dynamic-inputs" class="space-y-4">
+                    <!-- Input dinamis (tinggi, lebar) akan muncul di sini -->
+                </div>
+                
+                <button onclick="calculatePrice()"
+                        class="mt-6 w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition duration-200 shadow-md">
+                    HITUNG HARGA (Rp)
+                </button>
+            </div>
         </div>
 
-        <div id="result-area" class="mt-8 p-6 bg-blue-100 border border-blue-300 rounded-lg text-blue-900">
-            <h3 class="text-xl font-bold text-blue-800 mb-4 text-center">Rincian Estimasi Harga</h3>
-            <dl class="space-y-2">
-                <div class="flex justify-between text-base">
-                    <dt>Harga Kusen</dt>
-                    <dd id="result-profil" class="font-semibold">Rp 0</dd>
-                </div>
-                <div class="flex justify-between text-base">
-                    <dt>Harga Kaca</dt>
-                    <dd id="result-kaca" class="font-semibold">Rp 0</dd>
-                </div>
-                <hr class="my-2 border-t-2 border-blue-400">
-                <div class="flex justify-between text-2xl">
-                    <dt class="font-extrabold">Total Harga</dt>
-                    <dd id="total-price" class="font-extrabold">Rp 0</dd>
-                </div>
-            </dl>
+        <!-- KOLOM KANAN: UNTUK HASIL ESTIMASI -->
+        <!-- Posisi 'sticky' dan 'top-10' membuatnya tetap terlihat saat scroll di layar besar -->
+        <div class="md:sticky md:top-10">
+            <div id="result-area" class="p-6 bg-blue-100 border border-blue-300 rounded-lg text-blue-900">
+                <h3 class="text-xl font-bold text-blue-800 mb-4 text-center">Rincian Estimasi Harga</h3>
+                <dl class="space-y-2">
+                    <div class="flex justify-between text-base">
+                        <dt>Harga Kusen</dt>
+                        <dd id="result-profil" class="font-semibold">Rp 0</dd>
+                    </div>
+                    <div class="flex justify-between text-base">
+                        <dt>Harga Kaca</dt>
+                        <dd id="result-kaca" class="font-semibold">Rp 0</dd>
+                    </div>
+                    <hr class="my-2 border-t-2 border-blue-400">
+                    <div class="flex justify-between text-2xl">
+                        <dt class="font-extrabold">Total Harga</dt>
+                        <dd id="total-price" class="font-extrabold">Rp 0</dd>
+                    </div>
+                </dl>
+            </div>
         </div>
     </div>
     
