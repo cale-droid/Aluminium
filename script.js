@@ -17,6 +17,13 @@ const PRICE_DATA = {
     },
     // Harga kaca per meter persegi, direstrukturisasi
     KACA: {
+        "Clear": {
+            "5mm": 250000,
+            "6mm": 300000,
+            "8mm": 410000,
+            "10mm": 800000,
+            "12mm": 1000000
+        },
         "Clear Temper": {
             "5mm": 600000,
             "6mm": 670000,
