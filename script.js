@@ -40,73 +40,76 @@ const PRICE_DATA = {
     },
     // Biaya aksesoris per unit
     AKSESORIS: {
-        "jendela": 150000,
-        "pintu": 250000
+        "jendela": 0,
+        "pintu": 0
     }
 };
 
     const PRODUCT_FORMULA = {
         "jendela": {
             label: "Jendela Geser",
-            inputs: ["Tinggi (cm)", "Lebar (cm)", "Kuantitas Unit"],
-            // Opsi tambahan untuk produk ini
+            // Mengubah input menjadi "Total Tinggi" dan "Total Lebar"
+            inputs: ["Total Tinggi (cm)", "Total Lebar (cm)", "Kuantitas Unit"],
             options: ["profil", "kaca"], 
             formula: (inputs, options) => {
-                const [tinggi_cm, lebar_cm, kuantitas] = inputs;
-                // Konversi cm ke m untuk perhitungan harga
-                const tinggi_m = tinggi_cm / 100;
-            const lebar_m = lebar_cm / 100;
+                // Input sekarang adalah [total_tinggi_cm, total_lebar_cm, kuantitas]
+                const [total_tinggi_cm, total_lebar_cm, kuantitas] = inputs;
+                
+                // 1. Harga Profil Aluminium
+                const total_panjang_cm = total_tinggi_cm + total_lebar_cm;
+                const panjang_m = total_panjang_cm / 100;
+                const totalHargaProfil = (panjang_m * options.profil) * kuantitas;
 
-            // 1. Harga Profil Aluminium
-            const hargaProfilPerMeter = options.profil; // Harga sudah dipilih dari UI
-            const panjangKusen = (2 * tinggi_m) + (2 * lebar_m);
-            const panjangDaun = 2 * ((2 * tinggi_m) + lebar_m);
-            const totalHargaProfil = (panjangKusen + panjangDaun) * hargaProfilPerMeter;
+                // 2. Harga Kaca
+                let totalHargaKaca = 0;
+                if (options.kaca > 0) {
+                    const luasKaca = (total_tinggi_cm * total_lebar_cm) / 10000;
+                    totalHargaKaca = (luasKaca * options.kaca) * kuantitas;
+                }
 
-            // 2. Harga Kaca
-            const hargaKacaPerM2 = options.kaca; // Harga sudah dipilih dari UI
-            const luasKaca = tinggi_m * lebar_m;
-            const totalHargaKaca = luasKaca * hargaKacaPerM2;
+                // 3. Biaya Aksesoris
+                const biayaAksesoris = PRICE_DATA.AKSESORIS.jendela * kuantitas;
 
-            // 3. Biaya Aksesoris
-            const biayaAksesoris = PRICE_DATA.AKSESORIS.jendela;
-
-            // 4. Total
-            const hargaPerUnit = totalHargaProfil + totalHargaKaca + biayaAksesoris;
-            return hargaPerUnit * kuantitas;
-        }
-    },
-    "pintu": {
-        label: "Pintu Swing",
-        inputs: ["Tinggi (cm)", "Lebar (cm)", "Kuantitas Unit"],
-        options: ["profil", "kaca"], // Pintu juga bisa punya opsi kaca
-        formula: (inputs, options) => {
-            const [tinggi_cm, lebar_cm, kuantitas] = inputs;
-            const tinggi_m = tinggi_cm / 100;
-            const lebar_m = lebar_cm / 100;
-
-            // 1. Harga Profil
-            const hargaProfilPerMeter = options.profil;
-            const panjangProfil = (2 * tinggi_m) + (2 * lebar_m) + lebar_m; // Keliling + 1 palang
-            const totalHargaProfil = panjangProfil * hargaProfilPerMeter;
-
-            // 2. Harga Kaca (Asumsi setengah pintu adalah kaca, jika dipilih)
-            let totalHargaKaca = 0;
-            if (options.kaca > 0) { // Cek jika opsi kaca dipilih (bukan "Tanpa Kaca")
-                 const hargaKacaPerM2 = options.kaca;
-                 const luasKaca = (tinggi_m / 2) * lebar_m;
-                 totalHargaKaca = luasKaca * hargaKacaPerM2;
+                // Kembalikan objek dengan rincian harga total
+                return {
+                    hargaProfil: totalHargaProfil,
+                    hargaKaca: totalHargaKaca,
+                    biayaAksesoris: biayaAksesoris
+                };
             }
-            
-            // 3. Biaya Aksesoris
-            const biayaAksesoris = PRICE_DATA.AKSESORIS.pintu;
+        },
+        "pintu": {
+            label: "Pintu Swing",
+            inputs: ["Tinggi (cm)", "Lebar (cm)", "Kuantitas Unit"],
+            options: ["profil", "kaca"], // Pintu juga bisa punya opsi kaca
+            formula: (inputs, options) => {
+                const [tinggi_cm, lebar_cm, kuantitas] = inputs;
+                const tinggi_m = tinggi_cm / 100;
+                const lebar_m = lebar_cm / 100;
 
-            // 4. Total Harga
-            const hargaPerUnit = totalHargaProfil + totalHargaKaca + biayaAksesoris;
-            return hargaPerUnit * kuantitas;
+                // 1. Harga Profil
+                const panjangProfil = (2 * tinggi_m) + (2 * lebar_m) + lebar_m;
+                const totalHargaProfil = (panjangProfil * options.profil) * kuantitas;
+
+                // 2. Harga Kaca
+                let totalHargaKaca = 0;
+                if (options.kaca > 0) {
+                     const luasKaca = (tinggi_m / 2) * lebar_m;
+                     totalHargaKaca = (luasKaca * options.kaca) * kuantitas;
+                }
+                
+                // 3. Biaya Aksesoris
+                const biayaAksesoris = PRICE_DATA.AKSESORIS.pintu * kuantitas;
+
+                // Kembalikan objek dengan rincian harga total
+                return {
+                    hargaProfil: totalHargaProfil,
+                    hargaKaca: totalHargaKaca,
+                    biayaAksesoris: biayaAksesoris
+                };
+            }
         }
-    }
-};
+    };
 
 // Fungsi untuk membuat dropdown dengan gaya tema
 function createStyledSelect(id, label, options, placeholder) {
@@ -245,7 +248,9 @@ function calculatePrice() {
 
     const inputValues = product.inputs.map((_, index) => {
         const inputId = `input-${type}-${index}`;
-        return parseFloat(document.getElementById(inputId).value) || 0;
+        const value = document.getElementById(inputId).value;
+        // Ganti koma dengan titik sebelum di-parse
+        return parseFloat(value.replace(',', '.')) || 0;
     });
 
     const optionValues = {};
@@ -267,9 +272,22 @@ function calculatePrice() {
     }
     
     try {
-        const totalPrice = product.formula(inputValues, optionValues);
-        const resultElement = document.getElementById('total-price');
-        resultElement.textContent = `Rp ${new Intl.NumberFormat('id-ID').format(totalPrice.toFixed(0))}`; 
+        // Dapatkan rincian harga dari formula
+        const rincianHarga = product.formula(inputValues, optionValues);
+        
+        const totalProfil = rincianHarga.hargaProfil;
+        const totalKaca = rincianHarga.hargaKaca;
+        const totalAksesoris = rincianHarga.biayaAksesoris;
+        const grandTotal = totalProfil + totalKaca + totalAksesoris;
+
+        // Fungsi untuk format ke Rupiah
+        const formatRupiah = (angka) => `Rp ${new Intl.NumberFormat('id-ID').format(angka.toFixed(0))}`;
+
+        // Update UI dengan semua nilai
+        document.getElementById('result-profil').textContent = formatRupiah(totalProfil);
+        document.getElementById('result-kaca').textContent = formatRupiah(totalKaca);
+        document.getElementById('total-price').textContent = formatRupiah(grandTotal);
+
     } catch (e) {
         console.error("Kesalahan dalam perhitungan rumus:", e);
         alert("Terjadi kesalahan. Pastikan semua angka valid.");

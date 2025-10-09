@@ -50,11 +50,23 @@
         </button>
         </div>
 
-        <div class="mt-8 p-6 bg-blue-100 border border-blue-300 rounded-lg text-center">
-            <h3 class="text-xl font-bold text-blue-800 mb-2">Estimasi Total Harga</h3>
-            <p id="total-price" class="text-3xl font-extrabold text-blue-900">
-                Rp 0
-            </p>
+        <div id="result-area" class="mt-8 p-6 bg-blue-100 border border-blue-300 rounded-lg text-blue-900">
+            <h3 class="text-xl font-bold text-blue-800 mb-4 text-center">Rincian Estimasi Harga</h3>
+            <dl class="space-y-2">
+                <div class="flex justify-between text-base">
+                    <dt>Harga Kusen</dt>
+                    <dd id="result-profil" class="font-semibold">Rp 0</dd>
+                </div>
+                <div class="flex justify-between text-base">
+                    <dt>Harga Kaca</dt>
+                    <dd id="result-kaca" class="font-semibold">Rp 0</dd>
+                </div>
+                <hr class="my-2 border-t-2 border-blue-400">
+                <div class="flex justify-between text-2xl">
+                    <dt class="font-extrabold">Total Harga</dt>
+                    <dd id="total-price" class="font-extrabold">Rp 0</dd>
+                </div>
+            </dl>
         </div>
     </div>
     
