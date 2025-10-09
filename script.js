@@ -48,11 +48,10 @@ const PRICE_DATA = {
     const PRODUCT_FORMULA = {
         "jendela": {
             label: "Jendela Geser",
-            // Mengubah input menjadi "Total Tinggi" dan "Total Lebar"
             inputs: ["Total Tinggi (cm)", "Total Lebar (cm)", "Kuantitas Unit"],
             options: ["profil", "kaca"], 
-            formula: (inputs, options) => {
-                // Input sekarang adalah [total_tinggi_cm, total_lebar_cm, kuantitas]
+            // Formula sekarang menerima input kaca secara terpisah
+            formula: (inputs, glassInputs, options) => {
                 const [total_tinggi_cm, total_lebar_cm, kuantitas] = inputs;
                 
                 // 1. Harga Profil Aluminium
@@ -60,10 +59,11 @@ const PRICE_DATA = {
                 const panjang_m = total_panjang_cm / 100;
                 const totalHargaProfil = (panjang_m * options.profil) * kuantitas;
 
-                // 2. Harga Kaca
+                // 2. Harga Kaca (menggunakan input kaca baru)
                 let totalHargaKaca = 0;
-                if (options.kaca > 0) {
-                    const luasKaca = (total_tinggi_cm * total_lebar_cm) / 10000;
+                if (options.kaca > 0 && glassInputs) {
+                    const [tinggi_kaca_cm, lebar_kaca_cm] = glassInputs;
+                    const luasKaca = (tinggi_kaca_cm * lebar_kaca_cm) / 10000;
                     totalHargaKaca = (luasKaca * options.kaca) * kuantitas;
                 }
 
@@ -151,7 +151,7 @@ function showInputFields() {
 
     const product = PRODUCT_FORMULA[type];
 
-    // --- Baris Opsi Profil Kusen ---
+    // --- Baris Opsi Profil Kusen (tetap di atas) ---
     if (product.options.includes('profil')) {
         const profilRow = document.createElement('div');
         profilRow.className = 'flex space-x-4';
@@ -160,11 +160,26 @@ function showInputFields() {
         configArea.appendChild(profilRow);
     }
 
-    // --- Baris Opsi Kaca ---
+    // Buat Input Dimensi utama (Tinggi, Lebar, Kuantitas)
+    product.inputs.forEach((inputLabel, index) => {
+        const inputId = `input-${type}-${index}`;
+        dynamicInputs.innerHTML += `
+            <div>
+                <label for="${inputId}" class="block text-sm font-medium text-gray-700">${inputLabel}:</label>
+                <input type="number" id="${inputId}" step="any" value="0" 
+                       class="mt-1 w-full p-3 border border-gray-300 rounded-lg" required>
+            </div>
+        `;
+    });
+
+    // --- Pindahkan Opsi Kaca ke sini, di dalam area dynamicInputs ---
     if (product.options.includes('kaca')) {
+        const kacaContainer = document.createElement('div');
+        kacaContainer.className = 'space-y-4 pt-4 border-t border-gray-200'; // Tambahkan pemisah visual
+
         // Checkbox untuk mengontrol visibilitas kaca
         const kacaToggleRow = document.createElement('div');
-        kacaToggleRow.className = 'flex items-center pt-4';
+        kacaToggleRow.className = 'flex items-center';
         kacaToggleRow.innerHTML = `
             <label for="use-kaca-checkbox" class="inline-flex items-center cursor-pointer">
                 <span class="mr-3 text-sm font-medium text-gray-900">Pakai Kaca</span>
@@ -174,15 +189,37 @@ function showInputFields() {
                 </span>
             </label>
         `;
-        configArea.appendChild(kacaToggleRow);
+        kacaContainer.appendChild(kacaToggleRow);
 
-        // Kontainer untuk dropdown kaca (awalnya disembunyikan)
+        // Kontainer untuk dropdown dan input kaca (awalnya disembunyikan)
         const kacaOptionsRow = document.createElement('div');
         kacaOptionsRow.id = 'kaca-options-container';
-        kacaOptionsRow.className = 'flex space-x-4 mt-1 hidden';
-        kacaOptionsRow.innerHTML = createStyledSelect('option-kaca-type', 'Jenis Kaca', PRICE_DATA.KACA, '-- Pilih Jenis --');
-        kacaOptionsRow.innerHTML += createStyledSelect('option-kaca-thickness', 'Tebal Kaca', {}, '-- Pilih Jenis --');
-        configArea.appendChild(kacaOptionsRow);
+        kacaOptionsRow.className = 'flex flex-col space-y-4 hidden';
+        
+        const kacaSelects = document.createElement('div');
+        kacaSelects.className = 'flex space-x-4';
+        kacaSelects.innerHTML = createStyledSelect('option-kaca-type', 'Jenis Kaca', PRICE_DATA.KACA, '-- Pilih Jenis --');
+        kacaSelects.innerHTML += createStyledSelect('option-kaca-thickness', 'Tebal Kaca', {}, '-- Pilih Jenis --');
+        
+        const kacaInputs = document.createElement('div');
+        kacaInputs.className = 'flex space-x-4';
+        kacaInputs.innerHTML = `
+            <div>
+                <label for="input-kaca-tinggi" class="block text-sm font-medium text-gray-700">Tinggi Kaca (cm):</label>
+                <input type="number" id="input-kaca-tinggi" step="any" value="0" class="mt-1 w-full p-3 border border-gray-300 rounded-lg">
+            </div>
+            <div>
+                <label for="input-kaca-lebar" class="block text-sm font-medium text-gray-700">Lebar Kaca (cm):</label>
+                <input type="number" id="input-kaca-lebar" step="any" value="0" class="mt-1 w-full p-3 border border-gray-300 rounded-lg">
+            </div>
+        `;
+
+        kacaOptionsRow.appendChild(kacaSelects);
+        kacaOptionsRow.appendChild(kacaInputs);
+        kacaContainer.appendChild(kacaOptionsRow);
+
+        // Tambahkan seluruh kontainer kaca ke area input dinamis
+        dynamicInputs.appendChild(kacaContainer);
     }
 
     // --- Event Listeners ---
@@ -223,17 +260,7 @@ function showInputFields() {
         });
     }
 
-    // Buat Input Dimensi
-    product.inputs.forEach((inputLabel, index) => {
-        const inputId = `input-${type}-${index}`;
-        dynamicInputs.innerHTML += `
-            <div>
-                <label for="${inputId}" class="block text-sm font-medium text-gray-700">${inputLabel}:</label>
-                <input type="number" id="${inputId}" step="1" value="0" 
-                       class="mt-1 w-full p-3 border border-gray-300 rounded-lg" required>
-            </div>
-        `;
-    });
+    // Buat Input Dimensi (sudah dipindahkan ke atas)
 }
 
 // Fungsi untuk menjalankan perhitungan HARGA
@@ -249,7 +276,6 @@ function calculatePrice() {
     const inputValues = product.inputs.map((_, index) => {
         const inputId = `input-${type}-${index}`;
         const value = document.getElementById(inputId).value;
-        // Ganti koma dengan titik sebelum di-parse
         return parseFloat(value.replace(',', '.')) || 0;
     });
 
@@ -260,20 +286,29 @@ function calculatePrice() {
         optionValues.profil = (brand && size) ? PRICE_DATA.PROFIL[brand][size] : 0;
     }
 
+    let glassInputValues = null;
+    const useKaca = document.getElementById('use-kaca-checkbox') ? document.getElementById('use-kaca-checkbox').checked : false;
     if (product.options.includes('kaca')) {
-        const useKaca = document.getElementById('use-kaca-checkbox').checked;
         if (useKaca) {
             const kacaType = document.getElementById('option-kaca-type').value;
             const thickness = document.getElementById('option-kaca-thickness').value;
             optionValues.kaca = (kacaType && thickness) ? PRICE_DATA.KACA[kacaType][thickness] : 0;
+
+            // Ambil nilai dari input kaca yang baru
+            const tinggiKaca = document.getElementById('input-kaca-tinggi').value;
+            const lebarKaca = document.getElementById('input-kaca-lebar').value;
+            glassInputValues = [
+                parseFloat(tinggiKaca.replace(',', '.')) || 0,
+                parseFloat(lebarKaca.replace(',', '.')) || 0
+            ];
         } else {
             optionValues.kaca = 0;
         }
     }
     
     try {
-        // Dapatkan rincian harga dari formula
-        const rincianHarga = product.formula(inputValues, optionValues);
+        // Kirim input kaca ke formula
+        const rincianHarga = product.formula(inputValues, glassInputValues, optionValues);
         
         const totalProfil = rincianHarga.hargaProfil;
         const totalKaca = rincianHarga.hargaKaca;
@@ -287,6 +322,16 @@ function calculatePrice() {
         document.getElementById('result-profil').textContent = formatRupiah(totalProfil);
         document.getElementById('result-kaca').textContent = formatRupiah(totalKaca);
         document.getElementById('total-price').textContent = formatRupiah(grandTotal);
+
+        // Tampilkan atau sembunyikan dimensi kaca
+        const kacaDimensiEl = document.getElementById('result-kaca-dimensi');
+        if (useKaca && totalKaca > 0) {
+            const tinggi = glassInputValues[0];
+            const lebar = glassInputValues[1];
+            kacaDimensiEl.textContent = `(${tinggi} cm x ${lebar} cm)`;
+        } else {
+            kacaDimensiEl.textContent = ''; // Kosongkan jika tidak pakai kaca
+        }
 
     } catch (e) {
         console.error("Kesalahan dalam perhitungan rumus:", e);
